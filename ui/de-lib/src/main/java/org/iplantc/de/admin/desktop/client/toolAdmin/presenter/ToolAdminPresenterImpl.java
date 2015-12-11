@@ -85,6 +85,7 @@ public class ToolAdminPresenterImpl implements ToolAdminView.Presenter,
     @Override public void onAddToolSelected(AddToolSelectedEvent event) {
         //The UI handles creating a single tool request, but the admin/tools POST endpoint requires
         // an array of requests.  Wrapping the request inside an array.
+        // XXX: JDS Avoid use of factory at Presenter-level
         ToolList toolListAutoBean = factory.getToolList().as();
         List<Tool> toolList = new ArrayList<>();
         toolList.add(event.getTool());
