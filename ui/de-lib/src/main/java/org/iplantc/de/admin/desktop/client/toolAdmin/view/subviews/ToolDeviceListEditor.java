@@ -9,6 +9,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.IsEditor;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.inject.Inject;
 import com.google.web.bindery.autobean.shared.AutoBean;
 import com.google.web.bindery.autobean.shared.AutoBeanUtils;
 
@@ -39,8 +40,7 @@ public class ToolDeviceListEditor extends Composite implements IsEditor<Editor<L
 
     @UiField ListStore<ToolDevice> listStore;
     @UiField(provided = true)
-    ToolAdminView.ToolAdminViewAppearance appearance =
-            GWT.create(ToolAdminView.ToolAdminViewAppearance.class);
+    ToolAdminView.ToolAdminViewAppearance appearance;
 
 
     interface ToolDeviceProperties extends PropertyAccess<ToolDevice> {
@@ -50,10 +50,13 @@ public class ToolDeviceListEditor extends Composite implements IsEditor<Editor<L
         ValueProvider<ToolDevice, String> containerPath();
     }
 
-    private static final ToolDeviceProperties ToolDeviceProperties =
-            GWT.create(ToolDeviceProperties.class);
+    private final ToolDeviceProperties ToolDeviceProperties;
 
-    public ToolDeviceListEditor() {
+    @Inject
+    ToolDeviceListEditor(final ToolAdminView.ToolAdminViewAppearance appearance,
+                         final ToolDeviceProperties toolDeviceProperties) {
+        this.appearance = appearance;
+        this.ToolDeviceProperties = toolDeviceProperties;
         listStore = new ListStore<ToolDevice>(new ModelKeyProvider<ToolDevice>() {
             @Override
             public String getKey(ToolDevice item) {

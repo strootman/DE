@@ -2,10 +2,10 @@ package org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews;
 
 import org.iplantc.de.admin.desktop.client.toolAdmin.ToolAdminView;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.IsEditor;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.inject.Inject;
 
 import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.client.editor.ListStoreEditor;
@@ -32,10 +32,11 @@ public class ToolTestDataOutputFilesListEditor extends Composite
     @UiField
     ListStore<String> listStore;
     @UiField(provided = true)
-    ToolAdminView.ToolAdminViewAppearance appearance =
-            GWT.create(ToolAdminView.ToolAdminViewAppearance.class);
+    ToolAdminView.ToolAdminViewAppearance appearance;
 
-    public ToolTestDataOutputFilesListEditor() {
+    @Inject
+    ToolTestDataOutputFilesListEditor(final ToolAdminView.ToolAdminViewAppearance appearance) {
+        this.appearance = appearance;
         listStore = new ListStore<>(getModelKeyProvider());
         listStore.setAutoCommit(true);
 

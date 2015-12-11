@@ -11,6 +11,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.IsEditor;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.inject.Inject;
 import com.google.web.bindery.autobean.shared.AutoBean;
 import com.google.web.bindery.autobean.shared.AutoBeanUtils;
 
@@ -44,8 +45,7 @@ public class ToolVolumesFromListEditor extends Composite
     @UiField
     ListStore<ToolVolumesFrom> listStore;
     @UiField(provided = true)
-    ToolAdminView.ToolAdminViewAppearance appearance =
-            GWT.create(ToolAdminView.ToolAdminViewAppearance.class);
+    ToolAdminView.ToolAdminViewAppearance appearance;
 
 
     interface ToolVolumesFromProperties extends PropertyAccess<ToolVolumesFrom> {
@@ -61,10 +61,13 @@ public class ToolVolumesFromListEditor extends Composite
         ValueProvider<ToolVolumesFrom, Boolean> readOnly();
     }
 
-    private static final ToolVolumesFromProperties ToolVolumesFromProperties =
-            GWT.create(ToolVolumesFromProperties.class);
+    private final ToolVolumesFromProperties ToolVolumesFromProperties;
 
-    public ToolVolumesFromListEditor() {
+    @Inject
+    ToolVolumesFromListEditor(final ToolAdminView.ToolAdminViewAppearance appearance,
+                              final ToolVolumesFromProperties toolVolumesFromProperties) {
+        this.appearance = appearance;
+        this.ToolVolumesFromProperties = toolVolumesFromProperties;
         listStore = new ListStore<ToolVolumesFrom>(new ModelKeyProvider<ToolVolumesFrom>() {
             @Override
             public String getKey(ToolVolumesFrom item) {

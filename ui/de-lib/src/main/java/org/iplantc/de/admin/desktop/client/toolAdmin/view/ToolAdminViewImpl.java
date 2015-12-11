@@ -7,9 +7,7 @@ import org.iplantc.de.admin.desktop.client.toolAdmin.events.SaveToolSelectedEven
 import org.iplantc.de.admin.desktop.client.toolAdmin.events.ToolSelectedEvent;
 import org.iplantc.de.admin.desktop.client.toolAdmin.view.dialogs.ToolAdminDetailsDialog;
 import org.iplantc.de.client.models.tool.Tool;
-import org.iplantc.de.client.models.tool.ToolAutoBeanFactory;
 import org.iplantc.de.commons.client.ErrorHandler;
-import org.iplantc.de.commons.client.views.dialogs.IPlantDialog;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -18,25 +16,21 @@ import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.inject.client.AsyncProvider;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiFactory;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 
 import com.sencha.gxt.core.client.Style;
-import com.sencha.gxt.core.client.dom.ScrollSupport;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.Store;
 import com.sencha.gxt.widget.core.client.Composite;
-import com.sencha.gxt.widget.core.client.Dialog;
-import com.sencha.gxt.widget.core.client.box.AlertMessageBox;
-import com.sencha.gxt.widget.core.client.box.ConfirmMessageBox;
 import com.sencha.gxt.widget.core.client.button.TextButton;
-import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
-import com.sencha.gxt.widget.core.client.event.DialogHideEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
@@ -53,8 +47,8 @@ public class ToolAdminViewImpl extends Composite implements ToolAdminView,
                                                             SelectionHandler<Tool>,
                                                             SaveToolSelectedEvent.SaveToolSelectedEventHandler {
 
-    interface ToolAdminViewImplUiBinder extends UiBinder<Widget, ToolAdminViewImpl> {
 
+    interface ToolAdminViewImplUiBinder extends UiBinder<Widget, ToolAdminViewImpl> {
     }
 
     private final class NameFilter implements Store.StoreFilter<Tool> {
@@ -85,19 +79,18 @@ public class ToolAdminViewImpl extends Composite implements ToolAdminView,
     @UiField(provided = true)
     ToolAdminViewAppearance appearance;
 
+    @Inject
+    AsyncProvider<ToolAdminDetailsDialog> toolDetailsDlgProvider;
+
     private final ToolProperties toolProps;
-    private final ToolAutoBeanFactory factory;
     private final NameFilter nameFilter;
-    private ToolAdminView.Presenter presenter;
 
     @Inject
     ToolAdminViewImpl(final ToolAdminViewAppearance appearance,
                       ToolProperties toolProps,
-                      ToolAutoBeanFactory factory,
                       @Assisted ListStore<Tool> listStore) {
         this.appearance = appearance;
         this.toolProps = toolProps;
-        this.factory = factory;
         this.listStore = listStore;
         initWidget(uiBinder.createAndBindUi(this));
         nameFilter = new NameFilter();
@@ -120,6 +113,12 @@ public class ToolAdminViewImpl extends Composite implements ToolAdminView,
 
     @Override public HandlerRegistration addToolSelectedEventHandler(ToolSelectedEvent.ToolSelectedEventHandler handler) {
         return addHandler(handler, ToolSelectedEvent.TYPE);
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Event Handlers">
+    @Override public void onSaveToolSelected(SaveToolSelectedEvent event) {
+        grid.getSelectionModel().deselect(grid.getSelectionModel().getSelectedItem());
     }
     //</editor-fold>
 
@@ -155,146 +154,51 @@ public class ToolAdminViewImpl extends Composite implements ToolAdminView,
     }
 
     @Override
-    public void setPresenter(Presenter presenter) {
-        this.presenter = presenter;
-    }
-
-    @Override
-    public void setToolList(List<Tool> tools) {
-        listStore.replaceAll(tools);
-    }
-
-    @Override
     public void editToolDetails(final Tool tool) {
-        final ToolAdminDetailsView detailsPanel = ToolAdminDetailsView.addToolDetails(factory);
-        detailsPanel.edit(tool);
+        toolDetailsDlgProvider.get(new AsyncCallback<ToolAdminDetailsDialog>() {
 
-        final IPlantDialog dialogWindow = getIplantDialogWindow();
+            @Override public void onFailure(Throwable caught) {
+                ErrorHandler.post(caught);
+            }
 
-        final TextButton delete = getDeleteButton(tool, dialogWindow);
-        dialogWindow.addButton(delete);
-        dialogWindow.getOkButton().setText(appearance.dialogWindowUpdateBtnText());
-        dialogWindow.addOkButtonSelectHandler(new SelectEvent.SelectHandler() {
-            @Override
-            public void onSelect(SelectEvent event) {
-                Tool tool = detailsPanel.getTool();
-                if (detailsPanel.isValid()){
-                    SaveToolSelectedEvent saveToolSelectedEvent = new SaveToolSelectedEvent(tool);
-                    ToolAdminViewImpl.this.fireEvent(saveToolSelectedEvent);
-                    dialogWindow.hide();
-                    grid.getSelectionModel().deselect(grid.getSelectionModel().getSelectedItem());
-                }
-                else{
-                    AlertMessageBox alertMsgBox = new AlertMessageBox("Warning", appearance.completeRequiredFieldsError());
-                    alertMsgBox.show();
-                }
-
+            @Override public void onSuccess(final ToolAdminDetailsDialog result) {
+                result.show(tool);
+                result.addSaveToolSelectedEventHandler(new SaveToolSelectedEvent.SaveToolSelectedEventHandler() {
+                    @Override public void onSaveToolSelected(SaveToolSelectedEvent event) {
+                        fireEvent(event);
+                        result.hide();
+                        grid.getSelectionModel().deselect(grid.getSelectionModel().getSelectedItem());
+                    }
+                });
             }
         });
-        addCancelButton(dialogWindow);
-
-        addDetailsPanel(detailsPanel, dialogWindow);
-
-        dialogWindow.show();
     }
 
     @UiHandler("addButton")
     void addButtonClicked(SelectEvent event) {
-        final ToolAdminDetailsView detailsPanel = ToolAdminDetailsView.addToolDetails(factory);
+        toolDetailsDlgProvider.get(new AsyncCallback<ToolAdminDetailsDialog>() {
 
-        final IPlantDialog dialogWindow = getIplantDialogWindow();
-
-        dialogWindow.getOkButton().setText(appearance.dialogWindowUpdateBtnText());
-        dialogWindow.addOkButtonSelectHandler(new SelectEvent.SelectHandler() {
-
-            @Override
-            public void onSelect(SelectEvent event) {
-                Tool tool = detailsPanel.getTool();
-                if (detailsPanel.isValid()) {
-                    AddToolSelectedEvent toolSelectedEvent = new AddToolSelectedEvent(tool);
-                    fireEvent(toolSelectedEvent);
-                    dialogWindow.hide();
-                }
-                else{
-                    AlertMessageBox alertMsgBox = new AlertMessageBox("Warning", appearance.completeRequiredFieldsError());
-                    alertMsgBox.show();
-                }
+            @Override public void onFailure(Throwable caught) {
+                ErrorHandler.post(caught);
             }
-        });
-        addCancelButton(dialogWindow);
 
-        addDetailsPanel(detailsPanel, dialogWindow);
-
-        dialogWindow.show();
-    }
-
-    private void addDetailsPanel(ToolAdminDetailsView detailsPanel, IPlantDialog dialogWindow) {
-        FlowLayoutContainer container = addScrollSupport();
-        container.add(detailsPanel);
-        dialogWindow.add(container);
-    }
-
-    private void addCancelButton(final IPlantDialog dialogWindow) {
-        dialogWindow.addCancelButtonSelectHandler(new SelectEvent.SelectHandler() {
-            @Override
-            public void onSelect(SelectEvent event) {
-                dialogWindow.hide();
-            }
-        });
-    }
-
-    private FlowLayoutContainer addScrollSupport() {
-        FlowLayoutContainer container = new FlowLayoutContainer();
-        container.getScrollSupport().setScrollMode(ScrollSupport.ScrollMode.AUTO);
-        return container;
-    }
-
-    private TextButton getDeleteButton(final Tool tool,
-                                       final IPlantDialog dialogWindow) {
-        final TextButton delete = new TextButton();
-        delete.setText(appearance.dialogWindowDeleteBtnText());
-        delete.addSelectHandler(new SelectEvent.SelectHandler() {
-            @Override
-            public void onSelect(SelectEvent event) {
-                final ConfirmMessageBox deleteMsgBox =
-                        new ConfirmMessageBox("Confirm", "Delete " + tool.getName() + "?");
-                deleteMsgBox.addDialogHideHandler(new DialogHideEvent.DialogHideHandler() {
-                    @Override
-                    public void onDialogHide(DialogHideEvent event) {
-                        if (event.getHideButton().equals(Dialog.PredefinedButton.OK)
-                            || event.getHideButton().equals(Dialog.PredefinedButton.YES)) {
-                            DeleteToolSelectedEvent deleteToolSelectedEvent = new DeleteToolSelectedEvent(tool.getId());
-                            fireEvent(deleteToolSelectedEvent);
-                            deleteMsgBox.hide();
-                            dialogWindow.hide();
-                        }
+            @Override public void onSuccess(final ToolAdminDetailsDialog result) {
+                result.show();
+                result.addSaveToolSelectedEventHandler(new SaveToolSelectedEvent.SaveToolSelectedEventHandler() {
+                    @Override public void onSaveToolSelected(SaveToolSelectedEvent event) {
+                        AddToolSelectedEvent toolSelectedEvent = new AddToolSelectedEvent(event.getTool());
+                        fireEvent(toolSelectedEvent);
+                        result.hide();
                     }
                 });
-                deleteMsgBox.show();
             }
         });
-        return delete;
     }
-
-    @Override
-    public void deleteTool(String toolId) {
-        listStore.remove(listStore.findModelWithKey(toolId));
-    }
-
 
     @Override
     public void onSelection(SelectionEvent event) {
         ToolSelectedEvent toolSelectedEvent = new ToolSelectedEvent(grid.getSelectionModel().getSelectedItem());
         fireEvent(toolSelectedEvent);
-    }
-
-    private IPlantDialog getIplantDialogWindow() {
-        final IPlantDialog dialogWindow = new IPlantDialog();
-        dialogWindow.setHideOnButtonClick(false);
-        dialogWindow.setHeadingText(appearance.dialogWindowName());
-        dialogWindow.setResizable(true);
-        dialogWindow.setPixelSize(1000, 500);
-        return dialogWindow;
     }
 
     @UiHandler("filterField")

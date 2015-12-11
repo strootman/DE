@@ -1,16 +1,15 @@
 package org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews;
 
 import org.iplantc.de.admin.desktop.client.toolAdmin.ToolAdminView;
-import org.iplantc.de.client.models.tool.ToolAutoBeanFactory;
 import org.iplantc.de.client.models.tool.ToolContainer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.editor.client.Editor;
-import com.google.gwt.editor.client.SimpleBeanEditorDriver;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
 import com.sencha.gxt.widget.core.client.Composite;
 import com.sencha.gxt.widget.core.client.button.TextButton;
@@ -22,13 +21,9 @@ import com.sencha.gxt.widget.core.client.form.TextField;
 public class ToolContainerEditor extends Composite implements Editor<ToolContainer> {
 
 
-    interface EditorDriver extends SimpleBeanEditorDriver<ToolContainer, ToolContainerEditor> {
-    }
-
     interface ToolContainerEditorBinder extends UiBinder<Widget, ToolContainerEditor> {
     }
 
-    private final EditorDriver editorDriver = GWT.create(EditorDriver.class);
     private static ToolContainerEditorBinder uiBinder = GWT.create(ToolContainerEditorBinder.class);
 
     @UiField TextField nameEditor;
@@ -41,35 +36,36 @@ public class ToolContainerEditor extends Composite implements Editor<ToolContain
     @UiField TextButton addDeviceButton;
     @Ignore
     @UiField TextButton deleteDeviceButton;
-    @UiField ToolDeviceListEditor deviceListEditor;
+    @UiField(provided = true) ToolDeviceListEditor deviceListEditor;
     @Ignore
     @UiField TextButton addVolumesButton;
     @Ignore
     @UiField TextButton deleteVolumesButton;
-    @UiField ToolVolumeListEditor containerVolumesEditor;
+    @UiField(provided = true) ToolVolumeListEditor containerVolumesEditor;
     @Ignore
     @UiField TextButton addVolumesFromButton;
     @Ignore
     @UiField TextButton deleteVolumesFromButton;
-    @UiField ToolVolumesFromListEditor containerVolumesFromEditor;
-    @UiField ToolImageEditor imageEditor;
+    @UiField(provided = true) ToolVolumesFromListEditor containerVolumesFromEditor;
+    @UiField(provided = true) ToolImageEditor imageEditor;
     @Ignore
     @UiField FieldSet containerFieldSet;
     @UiField (provided = true)
-    ToolAdminView.ToolAdminViewAppearance appearance = GWT.create(ToolAdminView.ToolAdminViewAppearance.class);
+    ToolAdminView.ToolAdminViewAppearance appearance;
 
 
-    public ToolContainerEditor() {
-        ToolAutoBeanFactory factory = GWT.create(ToolAutoBeanFactory.class);
-        ToolContainer container = factory.getContainer().as();
-
-        container.setMemoryLimit(appearance.containerMemoryLimitDefaultValue());
-        container.setCpuShares(appearance.containerCPUSharesDefaultValue());
-
+    @Inject
+    ToolContainerEditor(final ToolAdminView.ToolAdminViewAppearance appearance,
+                        final ToolDeviceListEditor deviceListEditor,
+                        final ToolVolumeListEditor containerVolumesEditor,
+                        final ToolVolumesFromListEditor containerVolumesFromEditor,
+                        final ToolImageEditor imageEditor) {
+        this.appearance = appearance;
+        this.deviceListEditor = deviceListEditor;
+        this.containerVolumesEditor = containerVolumesEditor;
+        this.containerVolumesFromEditor = containerVolumesFromEditor;
+        this.imageEditor = imageEditor;
         initWidget(uiBinder.createAndBindUi(this));
-
-        editorDriver.initialize(this);
-        editorDriver.edit(container);
     }
 
     @UiHandler("addDeviceButton")
@@ -100,15 +96,6 @@ public class ToolContainerEditor extends Composite implements Editor<ToolContain
     @UiHandler("deleteVolumesFromButton")
     void onDeleteVolumesFromButtonClicked(SelectEvent event) {
         containerVolumesFromEditor.deleteVolumesFrom();
-    }
-
-    public ToolContainer getToolContainer() {
-        ToolContainer container = editorDriver.flush();
-        container.setDeviceList(deviceListEditor.getDeviceList());
-        container.setContainerVolumes(containerVolumesEditor.getVolumeList());
-        container.setContainerVolumesFrom(containerVolumesFromEditor.getVolumesFromList());
-        container.setImage(imageEditor.getToolImage());
-        return container;
     }
 
     public boolean isValid(){

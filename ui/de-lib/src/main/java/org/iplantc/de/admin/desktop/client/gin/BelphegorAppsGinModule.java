@@ -23,7 +23,18 @@ import org.iplantc.de.admin.desktop.client.toolAdmin.gin.factory.ToolAdminViewFa
 import org.iplantc.de.admin.desktop.client.toolAdmin.presenter.ToolAdminPresenterImpl;
 import org.iplantc.de.admin.desktop.client.toolAdmin.service.ToolAdminServiceFacade;
 import org.iplantc.de.admin.desktop.client.toolAdmin.service.impl.ToolAdminServiceFacadeImpl;
+import org.iplantc.de.admin.desktop.client.toolAdmin.view.ToolAdminDetailsView;
 import org.iplantc.de.admin.desktop.client.toolAdmin.view.ToolAdminViewImpl;
+import org.iplantc.de.admin.desktop.client.toolAdmin.view.dialogs.ToolAdminDetailsDialog;
+import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolContainerEditor;
+import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolDeviceListEditor;
+import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolImageEditor;
+import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolImplementationEditor;
+import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolTestDataEditor;
+import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolTestDataInputFilesListEditor;
+import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolTestDataOutputFilesListEditor;
+import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolVolumeListEditor;
+import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolVolumesFromListEditor;
 import org.iplantc.de.admin.desktop.client.toolRequest.ToolRequestView;
 import org.iplantc.de.admin.desktop.client.toolRequest.presenter.ToolRequestPresenterImpl;
 import org.iplantc.de.admin.desktop.client.toolRequest.service.ToolRequestServiceFacade;
@@ -80,6 +91,18 @@ public class BelphegorAppsGinModule extends AbstractGinModule {
         bind(EditMetadataTemplateView.class).to(EditMetadataTemplateViewImpl.class);
 
         bind(DiscEnvApiService.class).in(Singleton.class);
+
+        bind(ToolAdminDetailsDialog.class);
+        bind(ToolAdminDetailsView.class);
+        bind(ToolImplementationEditor.class);
+        bind(ToolTestDataEditor.class);
+        bind(ToolTestDataInputFilesListEditor.class);
+        bind(ToolTestDataOutputFilesListEditor.class);
+        bind(ToolContainerEditor.class);
+        bind(ToolDeviceListEditor.class);
+        bind(ToolVolumeListEditor.class);
+        bind(ToolVolumesFromListEditor.class);
+        bind(ToolImageEditor.class);
 
     }
 

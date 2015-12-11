@@ -3,7 +3,6 @@ package org.iplantc.de.admin.desktop.client.toolAdmin.view;
 import org.iplantc.de.admin.desktop.client.toolAdmin.ToolAdminView;
 import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolContainerEditor;
 import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolImplementationEditor;
-import org.iplantc.de.client.models.tool.ToolAutoBeanFactory;
 import org.iplantc.de.client.models.tool.Tool;
 
 import com.google.gwt.core.client.GWT;
@@ -26,15 +25,13 @@ import com.sencha.gxt.widget.core.client.form.TextField;
 public class ToolAdminDetailsView extends Composite implements Editor<Tool> {
 
 
-    interface EditorDriver
-            extends SimpleBeanEditorDriver<Tool, ToolAdminDetailsView> {
+    interface EditorDriver extends SimpleBeanEditorDriver<Tool, ToolAdminDetailsView> {
     }
 
     interface ToolAdminDetailsWindowUiBinder extends UiBinder<Widget, ToolAdminDetailsView> {
 
     }
 
-    private ToolAutoBeanFactory factory;
     private final EditorDriver editorDriver = GWT.create(EditorDriver.class);
     private static ToolAdminDetailsWindowUiBinder uiBinder =
             GWT.create(ToolAdminDetailsWindowUiBinder.class);
@@ -48,16 +45,18 @@ public class ToolAdminDetailsView extends Composite implements Editor<Tool> {
     @UiField TextField attributionEditor;
     @UiField TextField versionEditor;
     @UiField TextField locationEditor;
-    @UiField ToolImplementationEditor implementationEditor;
-    @UiField ToolContainerEditor containerEditor;
+    @UiField(provided = true) ToolImplementationEditor implementationEditor;
+    @UiField(provided = true) ToolContainerEditor containerEditor;
     @UiField (provided = true)
-    ToolAdminView.ToolAdminViewAppearance appearance = GWT.create(ToolAdminView.ToolAdminViewAppearance.class);
-
+    ToolAdminView.ToolAdminViewAppearance appearance;
 
     @Inject
-    ToolAdminDetailsView(ToolAutoBeanFactory toolFactory) {
-        this.factory = toolFactory;
-        Tool tool = factory.getTool().as();
+    ToolAdminDetailsView(final ToolAdminView.ToolAdminViewAppearance appearance,
+                         final ToolImplementationEditor implementationEditor,
+                         final ToolContainerEditor containerEditor) {
+        this.appearance = appearance;
+        this.implementationEditor = implementationEditor;
+        this.containerEditor = containerEditor;
         initWidget(uiBinder.createAndBindUi(this));
 
         nameLabel.setHTML(appearance.toolImportNameLabel());
@@ -65,15 +64,8 @@ public class ToolAdminDetailsView extends Composite implements Editor<Tool> {
         locationLabel.setHTML(appearance.toolImportLocationLabel());
 
         descriptionEditor.setHeight(250);
-        tool.setType(appearance.toolImportTypeDefaultValue());
-        tool.setContainer(containerEditor.getToolContainer());
 
         editorDriver.initialize(this);
-        editorDriver.edit(tool);
-    }
-
-    public static ToolAdminDetailsView addToolDetails(ToolAutoBeanFactory factory) {
-        return new ToolAdminDetailsView(factory);
     }
 
     public void edit(Tool tool) {
@@ -81,11 +73,7 @@ public class ToolAdminDetailsView extends Composite implements Editor<Tool> {
     }
 
     public Tool getTool() {
-
         Tool tool = editorDriver.flush();
-        tool.setContainer(containerEditor.getToolContainer());
-        tool.setImplementation(implementationEditor.getToolImplementation());
-
         return tool;
     }
 
