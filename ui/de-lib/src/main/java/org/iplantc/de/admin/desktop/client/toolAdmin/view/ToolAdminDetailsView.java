@@ -20,7 +20,7 @@ import com.sencha.gxt.widget.core.client.form.TextArea;
 import com.sencha.gxt.widget.core.client.form.TextField;
 
 /**
- * Created by aramsey on 10/30/15.
+ * @author aramsey
  */
 public class ToolAdminDetailsView extends Composite implements Editor<Tool> {
 

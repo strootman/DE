@@ -9,10 +9,8 @@ import com.google.web.bindery.autobean.shared.AutoBean;
 import com.google.web.bindery.autobean.shared.AutoBeanCodex;
 
 /**
- * Created by aramsey on 10/28/15.
+ * @author aramsey
  */
-
-
 public class ToolCallbackConverter extends AsyncCallbackConverter<String, Tool>{
 
     private final ToolAutoBeanFactory factory;

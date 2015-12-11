@@ -14,7 +14,9 @@ import com.sencha.gxt.widget.core.client.Composite;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 
-
+/**
+ * @author aramsey
+ */
 public class ToolTestDataEditor extends Composite implements Editor<ToolTestData> {
 
     interface ToolTestDataEditorBinder extends UiBinder<Widget, ToolTestDataEditor> {

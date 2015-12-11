@@ -14,7 +14,9 @@ import com.sencha.gxt.widget.core.client.Composite;
 import com.sencha.gxt.widget.core.client.form.FieldLabel;
 import com.sencha.gxt.widget.core.client.form.TextField;
 
-
+/**
+ * @author aramsey
+ */
 public class ToolImplementationEditor extends Composite implements Editor<ToolImplementation> {
 
     interface ToolImplementationEditorBinder extends UiBinder<Widget, ToolImplementationEditor> {

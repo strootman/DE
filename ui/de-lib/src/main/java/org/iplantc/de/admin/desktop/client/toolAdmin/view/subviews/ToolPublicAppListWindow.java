@@ -19,7 +19,9 @@ import com.sencha.gxt.widget.core.client.grid.Grid;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * @author aramsey
+ */
 public class ToolPublicAppListWindow extends Composite {
 
     interface ToolPublicAppListUiBinder extends UiBinder<Widget, ToolPublicAppListWindow> {

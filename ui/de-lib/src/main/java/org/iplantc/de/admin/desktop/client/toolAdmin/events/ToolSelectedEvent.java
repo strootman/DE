@@ -7,7 +7,8 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 
 /**
- * Created by jstroot on 12/10/15.
+ * @author jstroot
+ * @author aramsey
  */
 public class ToolSelectedEvent extends GwtEvent<ToolSelectedEvent.ToolSelectedEventHandler> {
     public static interface ToolSelectedEventHandler extends EventHandler {

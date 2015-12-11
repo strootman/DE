@@ -40,10 +40,8 @@ import com.sencha.gxt.widget.core.client.grid.Grid;
 import java.util.List;
 
 /**
- * Created by aramsey on 10/27/15.
+ * @author aramsey
  */
-
-
 public class ToolAdminViewImpl extends Composite implements ToolAdminView,
                                                             SelectionHandler<Tool>,
                                                             SaveToolSelectedEvent.SaveToolSelectedEventHandler {

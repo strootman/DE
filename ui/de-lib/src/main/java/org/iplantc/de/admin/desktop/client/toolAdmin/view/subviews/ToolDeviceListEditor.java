@@ -28,7 +28,9 @@ import com.sencha.gxt.widget.core.client.grid.editing.GridInlineEditing;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * @author aramsey
+ */
 public class ToolDeviceListEditor extends Composite implements IsEditor<Editor<List<ToolDevice>>> {
 
     private GridEditing<ToolDevice> editing;

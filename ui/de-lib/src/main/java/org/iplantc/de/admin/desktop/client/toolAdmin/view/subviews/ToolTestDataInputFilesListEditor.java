@@ -22,7 +22,9 @@ import com.sencha.gxt.widget.core.client.grid.editing.GridInlineEditing;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * @author aramsey
+ */
 public class ToolTestDataInputFilesListEditor extends Composite
         implements IsEditor<Editor<List<String>>> {
 

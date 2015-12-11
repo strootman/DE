@@ -5,7 +5,8 @@ import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 
 /**
- * Created by jstroot on 12/10/15.
+ * @author jstroot
+ * @author aramsey
  */
 public class DeleteToolSelectedEvent extends GwtEvent<DeleteToolSelectedEvent.DeleteToolSelectedEventHandler> {
     public static interface DeleteToolSelectedEventHandler extends EventHandler {

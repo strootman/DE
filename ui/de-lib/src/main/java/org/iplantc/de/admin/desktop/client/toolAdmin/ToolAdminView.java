@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.HasOneWidget;
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
- * Created by aramsey on 10/26/15.
+ * @author aramsey
  */
 public interface ToolAdminView extends IsWidget,
                                        IsMaskable,

@@ -18,6 +18,9 @@ import com.sencha.gxt.widget.core.client.form.FieldSet;
 import com.sencha.gxt.widget.core.client.form.IntegerField;
 import com.sencha.gxt.widget.core.client.form.TextField;
 
+/**
+ * @author aramsey
+ */
 public class ToolContainerEditor extends Composite implements Editor<ToolContainer> {
 
 

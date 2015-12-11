@@ -37,10 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by aramsey on 10/27/15.
+ * @author aramsey
  */
-
-
 public class ToolAdminPresenterImpl implements ToolAdminView.Presenter,
                                                DeleteToolSelectedEvent.DeleteToolSelectedEventHandler,
                                                SaveToolSelectedEvent.SaveToolSelectedEventHandler,

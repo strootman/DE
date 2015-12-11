@@ -28,7 +28,7 @@ import com.sencha.gxt.widget.core.client.event.DialogHideEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 
 /**
- * Created by jstroot on 12/10/15.
+ * @author jstroot
  */
 public class ToolAdminDetailsDialog extends IPlantDialog implements IsHideable,
                                                                     SaveToolSelectedEvent.HasSaveToolSelectedEventHandlers,
