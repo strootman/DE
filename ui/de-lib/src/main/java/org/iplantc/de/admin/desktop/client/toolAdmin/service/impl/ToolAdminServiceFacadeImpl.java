@@ -78,6 +78,7 @@ public class ToolAdminServiceFacadeImpl implements ToolAdminServiceFacade {
         }
 
         final Splittable encode = AutoBeanCodex.encode(AutoBeanUtils.getAutoBean(tool));
+        // FIXME: Scrub IDs from volumes
         ServiceCallWrapper wrapper = new ServiceCallWrapper(PATCH, address, encode.getPayload());
         deService.getServiceData(wrapper, new StringToVoidCallbackConverter(callback));
     }
