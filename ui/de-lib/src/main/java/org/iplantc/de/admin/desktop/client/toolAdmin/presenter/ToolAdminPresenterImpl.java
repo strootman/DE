@@ -52,6 +52,7 @@ public class ToolAdminPresenterImpl implements ToolAdminView.Presenter,
     private final ToolAutoBeanFactory factory;
     private final ToolAdminView.ToolAdminViewAppearance appearance;
     private final ListStore<Tool> listStore;
+    @Inject private IplantAnnouncer announcer;
 
     @Inject
     ToolAdminPresenterImpl(final ToolAdminViewFactory viewFactory,
@@ -100,7 +101,7 @@ public class ToolAdminPresenterImpl implements ToolAdminView.Presenter,
 
             @Override
             public void onSuccess(Void result) {
-                IplantAnnouncer.getInstance().schedule(new SuccessAnnouncementConfig(appearance.addToolSuccessText()));
+                announcer.schedule(new SuccessAnnouncementConfig(appearance.addToolSuccessText()));
                 updateView();
             }
 
@@ -128,7 +129,7 @@ public class ToolAdminPresenterImpl implements ToolAdminView.Presenter,
 
             @Override
             public void onSuccess(Void result) {
-                IplantAnnouncer.getInstance().schedule(new SuccessAnnouncementConfig(appearance.deleteToolSuccessText()));
+                announcer.schedule(new SuccessAnnouncementConfig(appearance.deleteToolSuccessText()));
                 listStore.remove(listStore.findModelWithKey(event.getToolId()));
             }
         });
@@ -179,7 +180,7 @@ public class ToolAdminPresenterImpl implements ToolAdminView.Presenter,
 
             @Override
             public void onSuccess(Void result) {
-                IplantAnnouncer.getInstance().schedule(new SuccessAnnouncementConfig(appearance.updateToolSuccessText()));
+                announcer.schedule(new SuccessAnnouncementConfig(appearance.updateToolSuccessText()));
                 updateView();
             }
         });
