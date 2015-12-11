@@ -18,23 +18,6 @@ import org.iplantc.de.admin.desktop.client.systemMessage.presenter.SystemMessage
 import org.iplantc.de.admin.desktop.client.systemMessage.service.SystemMessageServiceFacade;
 import org.iplantc.de.admin.desktop.client.systemMessage.service.impl.SystemMessageServiceFacadeImpl;
 import org.iplantc.de.admin.desktop.client.systemMessage.view.SystemMessageViewImpl;
-import org.iplantc.de.admin.desktop.client.toolAdmin.ToolAdminView;
-import org.iplantc.de.admin.desktop.client.toolAdmin.gin.factory.ToolAdminViewFactory;
-import org.iplantc.de.admin.desktop.client.toolAdmin.presenter.ToolAdminPresenterImpl;
-import org.iplantc.de.admin.desktop.client.toolAdmin.service.ToolAdminServiceFacade;
-import org.iplantc.de.admin.desktop.client.toolAdmin.service.impl.ToolAdminServiceFacadeImpl;
-import org.iplantc.de.admin.desktop.client.toolAdmin.view.ToolAdminDetailsView;
-import org.iplantc.de.admin.desktop.client.toolAdmin.view.ToolAdminViewImpl;
-import org.iplantc.de.admin.desktop.client.toolAdmin.view.dialogs.ToolAdminDetailsDialog;
-import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolContainerEditor;
-import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolDeviceListEditor;
-import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolImageEditor;
-import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolImplementationEditor;
-import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolTestDataEditor;
-import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolTestDataInputFilesListEditor;
-import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolTestDataOutputFilesListEditor;
-import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolVolumeListEditor;
-import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolVolumesFromListEditor;
 import org.iplantc.de.admin.desktop.client.toolRequest.ToolRequestView;
 import org.iplantc.de.admin.desktop.client.toolRequest.presenter.ToolRequestPresenterImpl;
 import org.iplantc.de.admin.desktop.client.toolRequest.service.ToolRequestServiceFacade;
@@ -54,7 +37,6 @@ import org.iplantc.de.client.services.TagsServiceFacade;
 import org.iplantc.de.shared.services.DiscEnvApiService;
 
 import com.google.gwt.inject.client.AbstractGinModule;
-import com.google.gwt.inject.client.assistedinject.GinFactoryModuleBuilder;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
@@ -75,12 +57,6 @@ public class BelphegorAppsGinModule extends AbstractGinModule {
         bind(ToolRequestView.Presenter.class).to(ToolRequestPresenterImpl.class);
         bind(ToolRequestServiceFacade.class).to(ToolRequestServiceFacadeImpl.class);
 
-        install(new GinFactoryModuleBuilder()
-                    .implement(ToolAdminView.class, ToolAdminViewImpl.class)
-                    .build(ToolAdminViewFactory.class));
-        bind(ToolAdminView.Presenter.class).to(ToolAdminPresenterImpl.class);
-        bind(ToolAdminServiceFacade.class).to(ToolAdminServiceFacadeImpl.class);
-
         bind(SystemMessageView.class).to(SystemMessageViewImpl.class);
         bind(SystemMessageView.Presenter.class).to(SystemMessagePresenterImpl.class);
         bind(SystemMessageServiceFacade.class).to(SystemMessageServiceFacadeImpl.class);
@@ -91,18 +67,6 @@ public class BelphegorAppsGinModule extends AbstractGinModule {
         bind(EditMetadataTemplateView.class).to(EditMetadataTemplateViewImpl.class);
 
         bind(DiscEnvApiService.class).in(Singleton.class);
-
-        bind(ToolAdminDetailsDialog.class);
-        bind(ToolAdminDetailsView.class);
-        bind(ToolImplementationEditor.class);
-        bind(ToolTestDataEditor.class);
-        bind(ToolTestDataInputFilesListEditor.class);
-        bind(ToolTestDataOutputFilesListEditor.class);
-        bind(ToolContainerEditor.class);
-        bind(ToolDeviceListEditor.class);
-        bind(ToolVolumeListEditor.class);
-        bind(ToolVolumesFromListEditor.class);
-        bind(ToolImageEditor.class);
 
     }
 
