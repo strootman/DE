@@ -19,6 +19,7 @@ import org.iplantc.de.admin.desktop.client.systemMessage.service.SystemMessageSe
 import org.iplantc.de.admin.desktop.client.systemMessage.service.impl.SystemMessageServiceFacadeImpl;
 import org.iplantc.de.admin.desktop.client.systemMessage.view.SystemMessageViewImpl;
 import org.iplantc.de.admin.desktop.client.toolAdmin.ToolAdminView;
+import org.iplantc.de.admin.desktop.client.toolAdmin.gin.factory.ToolAdminViewFactory;
 import org.iplantc.de.admin.desktop.client.toolAdmin.presenter.ToolAdminPresenterImpl;
 import org.iplantc.de.admin.desktop.client.toolAdmin.service.ToolAdminServiceFacade;
 import org.iplantc.de.admin.desktop.client.toolAdmin.service.impl.ToolAdminServiceFacadeImpl;
@@ -42,6 +43,7 @@ import org.iplantc.de.client.services.TagsServiceFacade;
 import org.iplantc.de.shared.services.DiscEnvApiService;
 
 import com.google.gwt.inject.client.AbstractGinModule;
+import com.google.gwt.inject.client.assistedinject.GinFactoryModuleBuilder;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
@@ -62,7 +64,9 @@ public class BelphegorAppsGinModule extends AbstractGinModule {
         bind(ToolRequestView.Presenter.class).to(ToolRequestPresenterImpl.class);
         bind(ToolRequestServiceFacade.class).to(ToolRequestServiceFacadeImpl.class);
 
-        bind(ToolAdminView.class).to(ToolAdminViewImpl.class);
+        install(new GinFactoryModuleBuilder()
+                    .implement(ToolAdminView.class, ToolAdminViewImpl.class)
+                    .build(ToolAdminViewFactory.class));
         bind(ToolAdminView.Presenter.class).to(ToolAdminPresenterImpl.class);
         bind(ToolAdminServiceFacade.class).to(ToolAdminServiceFacadeImpl.class);
 

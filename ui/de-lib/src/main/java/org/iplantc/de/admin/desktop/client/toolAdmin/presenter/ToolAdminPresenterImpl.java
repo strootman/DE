@@ -1,7 +1,13 @@
 package org.iplantc.de.admin.desktop.client.toolAdmin.presenter;
 
 import org.iplantc.de.admin.desktop.client.toolAdmin.ToolAdminView;
+import org.iplantc.de.admin.desktop.client.toolAdmin.events.AddToolSelectedEvent;
+import org.iplantc.de.admin.desktop.client.toolAdmin.events.DeleteToolSelectedEvent;
+import org.iplantc.de.admin.desktop.client.toolAdmin.events.SaveToolSelectedEvent;
+import org.iplantc.de.admin.desktop.client.toolAdmin.events.ToolSelectedEvent;
+import org.iplantc.de.admin.desktop.client.toolAdmin.gin.factory.ToolAdminViewFactory;
 import org.iplantc.de.admin.desktop.client.toolAdmin.service.ToolAdminServiceFacade;
+import org.iplantc.de.admin.desktop.client.toolAdmin.view.ToolProperties;
 import org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews.ToolPublicAppListWindow;
 import org.iplantc.de.client.models.apps.AppAutoBeanFactory;
 import org.iplantc.de.client.models.apps.AppList;
@@ -23,6 +29,7 @@ import com.google.inject.Inject;
 import com.google.web.bindery.autobean.shared.AutoBeanCodex;
 
 import com.sencha.gxt.core.client.dom.ScrollSupport;
+import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.container.FlowLayoutContainer;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 
@@ -34,23 +41,39 @@ import java.util.List;
  */
 
 
-public class ToolAdminPresenterImpl implements ToolAdminView.Presenter {
+public class ToolAdminPresenterImpl implements ToolAdminView.Presenter,
+                                               DeleteToolSelectedEvent.DeleteToolSelectedEventHandler,
+                                               SaveToolSelectedEvent.SaveToolSelectedEventHandler,
+                                               AddToolSelectedEvent.AddToolSelectedEventHandler,
+                                               ToolSelectedEvent.ToolSelectedEventHandler {
 
     private final ToolAdminView view;
     private final ToolAdminServiceFacade toolAdminServiceFacade;
     private final ToolAutoBeanFactory factory;
     private final ToolAdminView.ToolAdminViewAppearance appearance;
+    private final ListStore<Tool> listStore;
 
     @Inject
-    public ToolAdminPresenterImpl(final ToolAdminView view,
-                                  ToolAdminServiceFacade toolAdminServiceFacade,
-                                  ToolAutoBeanFactory factory,
-                                  ToolAdminView.ToolAdminViewAppearance appearance) {
-        this.view = view;
+    ToolAdminPresenterImpl(final ToolAdminViewFactory viewFactory,
+                           ToolAdminServiceFacade toolAdminServiceFacade,
+                           ToolAutoBeanFactory factory,
+                           ToolProperties toolProperties,
+                           ToolAdminView.ToolAdminViewAppearance appearance) {
+        this.listStore = createListStore(toolProperties);
+        this.view = viewFactory.create(listStore);
+        view.addDeleteToolSelectedEventHandler(this);
+        view.addSaveToolSelectedEventHandler(this);
+        view.addAddToolSelectedEventHandler(this);
+        view.addToolSelectedEventHandler(this);
         this.factory = factory;
         this.appearance = appearance;
-        view.setPresenter(this);
         this.toolAdminServiceFacade = toolAdminServiceFacade;
+    }
+
+    ListStore<Tool> createListStore(final ToolProperties toolProps) {
+        final ListStore<Tool> listStore = new ListStore<>(toolProps.id());
+        listStore.setEnableFilters(true);
+        return listStore;
     }
 
     @Override
@@ -60,14 +83,12 @@ public class ToolAdminPresenterImpl implements ToolAdminView.Presenter {
 
     }
 
-    @Override
-    public void addTool(Tool tool) {
-
+    @Override public void onAddToolSelected(AddToolSelectedEvent event) {
         //The UI handles creating a single tool request, but the admin/tools POST endpoint requires
         // an array of requests.  Wrapping the request inside an array.
         ToolList toolListAutoBean = factory.getToolList().as();
-        List<Tool> toolList = new ArrayList<Tool>();
-        toolList.add(tool);
+        List<Tool> toolList = new ArrayList<>();
+        toolList.add(event.getTool());
         toolListAutoBean.setToolList(toolList);
 
         toolAdminServiceFacade.addTool(toolListAutoBean, new AsyncCallback<Void>() {
@@ -83,6 +104,52 @@ public class ToolAdminPresenterImpl implements ToolAdminView.Presenter {
                 updateView();
             }
 
+        });
+    }
+
+    @Override public void onDeleteToolSelected(final DeleteToolSelectedEvent event) {
+        toolAdminServiceFacade.deleteTool(event.getToolId(), new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                SimpleServiceError serviceError =
+                        AutoBeanCodex.decode(factory, SimpleServiceError.class, caught.getMessage())
+                                     .as();
+                if (serviceError.getErrorCode().equals(ServiceErrorCode.ERR_NOT_WRITEABLE.toString())) {
+                    IPlantDialog publicAppDialog = getPublicAppDialog(caught,
+                                                                      appearance.deletePublicToolTitle(),
+                                                                      appearance.deletePublicToolBody(),
+                                                                      null);
+
+                    publicAppDialog.show();
+                } else {
+                    ErrorHandler.post(caught);
+                }
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                IplantAnnouncer.getInstance().schedule(new SuccessAnnouncementConfig(appearance.deleteToolSuccessText()));
+                listStore.remove(listStore.findModelWithKey(event.getToolId()));
+            }
+        });
+    }
+
+    @Override public void onSaveToolSelected(SaveToolSelectedEvent event) {
+        updateTool(event.getTool(), false);
+    }
+
+    @Override public void onToolSelected(ToolSelectedEvent event) {
+
+        toolAdminServiceFacade.getToolDetails(event.getTool().getId(), new AsyncCallback<Tool>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                ErrorHandler.post(caught);
+            }
+
+            @Override
+            public void onSuccess(Tool result) {
+                view.editToolDetails(result);
+            }
         });
     }
 
@@ -153,54 +220,6 @@ public class ToolAdminPresenterImpl implements ToolAdminView.Presenter {
         return container;
     }
 
-    @Override
-    public void updateTool(Tool tool) {
-        updateTool(tool, false);
-    }
-
-    @Override
-    public void getToolDetails(Tool tool) {
-        toolAdminServiceFacade.getToolDetails(tool.getId(), new AsyncCallback<Tool>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                ErrorHandler.post(caught);
-            }
-
-            @Override
-            public void onSuccess(Tool result) {
-                view.setToolDetails(result);
-            }
-        });
-    }
-
-    @Override
-    public void deleteTool(final Tool tool) {
-        toolAdminServiceFacade.deleteTool(tool.getId(), new AsyncCallback<Void>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                SimpleServiceError serviceError =
-                        AutoBeanCodex.decode(factory, SimpleServiceError.class, caught.getMessage())
-                                     .as();
-                if (serviceError.getErrorCode().equals(ServiceErrorCode.ERR_NOT_WRITEABLE.toString())) {
-                    IPlantDialog publicAppDialog = getPublicAppDialog(caught,
-                                                                      appearance.deletePublicToolTitle(),
-                                                                      appearance.deletePublicToolBody(),
-                                                                      null);
-
-                    publicAppDialog.show();
-                } else {
-                    ErrorHandler.post(caught);
-                }
-            }
-
-            @Override
-            public void onSuccess(Void result) {
-                IplantAnnouncer.getInstance().schedule(new SuccessAnnouncementConfig(appearance.deleteToolSuccessText()));
-                view.deleteTool(tool.getId());
-            }
-        });
-    }
-
     private void updateView() {
         String searchTerm = "*";
         updateView(searchTerm);
@@ -215,7 +234,7 @@ public class ToolAdminPresenterImpl implements ToolAdminView.Presenter {
 
             @Override
             public void onSuccess(List<Tool> result) {
-                view.setToolList(result);
+                listStore.replaceAll(result);
             }
         });
     }
