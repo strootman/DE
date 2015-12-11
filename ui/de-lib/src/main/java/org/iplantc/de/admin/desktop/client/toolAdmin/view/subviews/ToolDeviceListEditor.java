@@ -1,6 +1,7 @@
 package org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews;
 
 import org.iplantc.de.admin.desktop.client.toolAdmin.ToolAdminView;
+import org.iplantc.de.admin.desktop.client.toolAdmin.model.ToolDeviceProperties;
 import org.iplantc.de.client.models.tool.ToolAutoBeanFactory;
 import org.iplantc.de.client.models.tool.ToolDevice;
 
@@ -13,11 +14,9 @@ import com.google.inject.Inject;
 import com.google.web.bindery.autobean.shared.AutoBean;
 import com.google.web.bindery.autobean.shared.AutoBeanUtils;
 
-import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.client.editor.ListStoreEditor;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.data.shared.ModelKeyProvider;
-import com.sencha.gxt.data.shared.PropertyAccess;
 import com.sencha.gxt.widget.core.client.Composite;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
@@ -43,14 +42,7 @@ public class ToolDeviceListEditor extends Composite implements IsEditor<Editor<L
     ToolAdminView.ToolAdminViewAppearance appearance;
 
 
-    interface ToolDeviceProperties extends PropertyAccess<ToolDevice> {
-
-        ValueProvider<ToolDevice, String> hostPath();
-
-        ValueProvider<ToolDevice, String> containerPath();
-    }
-
-    private final ToolDeviceProperties ToolDeviceProperties;
+    private final org.iplantc.de.admin.desktop.client.toolAdmin.model.ToolDeviceProperties ToolDeviceProperties;
 
     @Inject
     ToolDeviceListEditor(final ToolAdminView.ToolAdminViewAppearance appearance,

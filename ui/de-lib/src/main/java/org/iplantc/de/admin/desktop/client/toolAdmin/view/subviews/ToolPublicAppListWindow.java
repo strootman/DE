@@ -1,6 +1,7 @@
 package org.iplantc.de.admin.desktop.client.toolAdmin.view.subviews;
 
 import org.iplantc.de.admin.desktop.client.toolAdmin.ToolAdminView;
+import org.iplantc.de.admin.desktop.client.toolAdmin.model.AppProperties;
 import org.iplantc.de.client.models.apps.App;
 
 import com.google.gwt.core.client.GWT;
@@ -9,10 +10,7 @@ import com.google.gwt.uibinder.client.UiFactory;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 
-import com.sencha.gxt.core.client.ValueProvider;
 import com.sencha.gxt.data.shared.ListStore;
-import com.sencha.gxt.data.shared.ModelKeyProvider;
-import com.sencha.gxt.data.shared.PropertyAccess;
 import com.sencha.gxt.widget.core.client.Composite;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
@@ -28,20 +26,7 @@ public class ToolPublicAppListWindow extends Composite {
 
     }
 
-    interface AppProperties extends PropertyAccess<App> {
-
-        ModelKeyProvider<App> id();
-
-        ValueProvider<App, String> name();
-
-        ValueProvider<App, String> integratorName();
-
-        ValueProvider<App, String> integratorEmail();
-
-        ValueProvider<App, Boolean> isDisabled();
-    }
-
-    private static final AppProperties AppProperties = GWT.create(AppProperties.class);
+    private static final org.iplantc.de.admin.desktop.client.toolAdmin.model.AppProperties AppProperties = GWT.create(AppProperties.class);
     private static ToolPublicAppListUiBinder uiBinder = GWT.create(ToolPublicAppListUiBinder.class);
     @UiField Grid<App> grid;
     @UiField ListStore<App> listStore;
