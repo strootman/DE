@@ -13,6 +13,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
 import com.sencha.gxt.widget.core.client.form.FieldLabel;
@@ -22,14 +23,14 @@ import com.sencha.gxt.widget.core.client.form.TextField;
 /**
  * Created by aramsey on 10/30/15.
  */
-public class ToolAdminDetailsWindow extends Composite implements Editor<Tool> {
+public class ToolAdminDetailsView extends Composite implements Editor<Tool> {
 
 
     interface EditorDriver
-            extends SimpleBeanEditorDriver<Tool, ToolAdminDetailsWindow> {
+            extends SimpleBeanEditorDriver<Tool, ToolAdminDetailsView> {
     }
 
-    interface ToolAdminDetailsWindowUiBinder extends UiBinder<Widget, ToolAdminDetailsWindow> {
+    interface ToolAdminDetailsWindowUiBinder extends UiBinder<Widget, ToolAdminDetailsView> {
 
     }
 
@@ -53,7 +54,8 @@ public class ToolAdminDetailsWindow extends Composite implements Editor<Tool> {
     ToolAdminView.ToolAdminViewAppearance appearance = GWT.create(ToolAdminView.ToolAdminViewAppearance.class);
 
 
-    private ToolAdminDetailsWindow(ToolAutoBeanFactory toolFactory) {
+    @Inject
+    ToolAdminDetailsView(ToolAutoBeanFactory toolFactory) {
         this.factory = toolFactory;
         Tool tool = factory.getTool().as();
         initWidget(uiBinder.createAndBindUi(this));
@@ -70,8 +72,8 @@ public class ToolAdminDetailsWindow extends Composite implements Editor<Tool> {
         editorDriver.edit(tool);
     }
 
-    public static ToolAdminDetailsWindow addToolDetails(ToolAutoBeanFactory factory) {
-        return new ToolAdminDetailsWindow(factory);
+    public static ToolAdminDetailsView addToolDetails(ToolAutoBeanFactory factory) {
+        return new ToolAdminDetailsView(factory);
     }
 
     public void edit(Tool tool) {
